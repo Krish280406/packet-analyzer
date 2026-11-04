@@ -1,0 +1,7 @@
+bin/
+target/
+.DS_Store
+.idea/
+.vscode/
+*.class
+__pycache__/
