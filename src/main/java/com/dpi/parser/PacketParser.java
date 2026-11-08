@@ -21,7 +21,6 @@ public class PacketParser {
         public static final byte URG = 0x20;
     }
 
-    // Day 3 version: Ethernet + IPv4 only. TCP/UDP is added on Day 4.
     public static boolean parse(RawPacket raw, ParsedPacket parsed) {
         parsed.timestampSec = raw.header.tsSec;
         parsed.timestampUsec = raw.header.tsUsec;
@@ -42,6 +41,20 @@ public class PacketParser {
             int versionIHL = data[offset] & 0xFF;
             int ihl = (versionIHL & 0x0F) * 4;
             offset += ihl;
+
+            if (parsed.protocol == TCP) {
+                if (!parseTCP(data, parsed, offset)) {
+                    return false;
+                }
+                int dataOffset = (data[offset + 12] & 0xFF) >> 4;
+                int tcpHeaderLen = dataOffset * 4;
+                offset += tcpHeaderLen;
+            } else if (parsed.protocol == UDP) {
+                if (!parseUDP(data, parsed, offset)) {
+                    return false;
+                }
+                offset += 8;
+            }
         }
 
         if (offset < data.length) {
@@ -76,6 +89,32 @@ public class PacketParser {
         parsed.srcIp = ipToString(data, offset + 12);
         parsed.destIp = ipToString(data, offset + 16);
         parsed.hasIP = true;
+        return true;
+    }
+
+    private static boolean parseTCP(byte[] data, ParsedPacket parsed, int offset) {
+        if (data.length < offset + 20) return false;
+        ByteBuffer bb = ByteBuffer.wrap(data, offset, 20);
+        bb.order(ByteOrder.BIG_ENDIAN);
+        parsed.srcPort = bb.getShort() & 0xFFFF;
+        parsed.destPort = bb.getShort() & 0xFFFF;
+        parsed.seqNumber = bb.getInt() & 0xFFFFFFFFL;
+        parsed.ackNumber = bb.getInt() & 0xFFFFFFFFL;
+        int dataOffset = (data[offset + 12] & 0xFF) >> 4;
+        int tcpHeaderLen = dataOffset * 4;
+        if (tcpHeaderLen < 20 || data.length < offset + tcpHeaderLen) return false;
+        parsed.tcpFlags = data[offset + 13];
+        parsed.hasTCP = true;
+        return true;
+    }
+
+    private static boolean parseUDP(byte[] data, ParsedPacket parsed, int offset) {
+        if (data.length < offset + 8) return false;
+        ByteBuffer bb = ByteBuffer.wrap(data, offset, 8);
+        bb.order(ByteOrder.BIG_ENDIAN);
+        parsed.srcPort = bb.getShort() & 0xFFFF;
+        parsed.destPort = bb.getShort() & 0xFFFF;
+        parsed.hasUDP = true;
         return true;
     }
 
