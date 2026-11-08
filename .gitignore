@@ -5,3 +5,4 @@ target/
 .vscode/
 *.class
 __pycache__/
+scratch/
