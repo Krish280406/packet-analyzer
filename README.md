@@ -14,4 +14,4 @@ finds which app each connection belongs to, and can block traffic by app or doma
 pcap reader, ethernet, IP, TCP and UDP parsing, flow tracking, SNI, HTTP host and DNS extraction,
 app classification, blocking rules, single-threaded engine.
 
-Multi-threaded engine is coming next (queue and threading basics done).
+Multi-threaded engine is coming next (queue, load balancer and worker threads done).
