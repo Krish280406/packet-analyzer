@@ -73,7 +73,7 @@ java -cp target/packet-analyzer-2.0.0.jar com.dpi.engine.MultiThreadedDPIEngine 
 
 ## Known problems (things I plan to fix)
 
-- The output pcap is never written. The output argument is accepted but unused
+- The output pcap is never written yet. PcapWriter is done and tested, wiring it into the engines is next
 - --block-ip does not work in multi-thread mode (0 dropped instead of 5), because the two engines pack IPs in different byte order
 - In multi-thread mode, packets of one flow can go to different workers, so blocked counts can depend on timing
 - HTTP flows are labelled HTTPS
@@ -158,7 +158,7 @@ java -cp target/packet-analyzer-2.0.0.jar com.dpi.engine.MultiThreadedDPIEngine 
 
 ## Known problems (things I plan to fix)
 
-- The output pcap is never written. The output argument is accepted but unused
+- The output pcap is never written yet. PcapWriter is done and tested, wiring it into the engines is next
 - --block-ip does not work in multi-thread mode (0 dropped instead of 5), because the two engines pack IPs in different byte order
 - In multi-thread mode, packets of one flow can go to different workers, so blocked counts can depend on timing
 - HTTP flows are labelled HTTPS
