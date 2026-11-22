@@ -13,9 +13,13 @@ public class DPIEngine {
     private Map<FiveTuple, Connection> flows;
     private DPIStats stats;
     private String inputFile;
+    private String outputFile;
+    private PcapWriter pcapWriter;
 
     public DPIEngine(String inputFile, String outputFile) {
         this.inputFile = inputFile;
+        this.outputFile = outputFile;
+        this.pcapWriter = new PcapWriter();
         this.pcapReader = new PcapReader();
         this.ruleManager = new RuleManager();
         this.flows = new ConcurrentHashMap<>();
@@ -30,6 +34,8 @@ public class DPIEngine {
             }
 
             System.out.println("Starting DPI processing...");
+
+            pcapWriter.open(outputFile);
 
             RawPacket rawPacket = new RawPacket();
             int packetCount = 0;
@@ -66,6 +72,7 @@ public class DPIEngine {
                 } else {
                     connection.setAction(PacketAction.FORWARD);
                     stats.incForwardedPackets();
+                    pcapWriter.writePacket(rawPacket);
                 }
 
                 connection.incPacketsIn();
@@ -78,6 +85,7 @@ public class DPIEngine {
             }
 
             pcapReader.close();
+            pcapWriter.close();
             generateReport();
             return true;
 
