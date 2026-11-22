@@ -1,7 +1,6 @@
 package com.dpi.engine;
 
 import com.dpi.pcap.*;
-import com.dpi.parser.*;
 import com.dpi.types.*;
 import java.util.*;
 import java.util.concurrent.*;
