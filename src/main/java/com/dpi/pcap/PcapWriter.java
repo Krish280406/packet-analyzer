@@ -27,7 +27,7 @@ public class PcapWriter {
         return true;
     }
 
-    public void writePacket(RawPacket packet) throws IOException {
+    public synchronized void writePacket(RawPacket packet) throws IOException {
         if (out == null) {
             throw new IOException("PcapWriter is not open");
         }
