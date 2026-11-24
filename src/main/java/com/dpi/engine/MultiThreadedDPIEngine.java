@@ -11,6 +11,8 @@ public class MultiThreadedDPIEngine {
     private Map<FiveTuple, Connection> flows;
     private DPIStats stats;
     private String inputFile;
+    private String outputFile;
+    private PcapWriter pcapWriter;
     private int numThreads;
 
     // Thread-safe queues
@@ -22,6 +24,8 @@ public class MultiThreadedDPIEngine {
     @SuppressWarnings("unchecked")
     public MultiThreadedDPIEngine(String inputFile, String outputFile, int numThreads) {
         this.inputFile = inputFile;
+        this.outputFile = outputFile;
+        this.pcapWriter = new PcapWriter();
         this.numThreads = numThreads > 0 ? numThreads : Runtime.getRuntime().availableProcessors();
         this.pcapReader = new PcapReader();
         this.ruleManager = new RuleManager();
@@ -48,6 +52,8 @@ public class MultiThreadedDPIEngine {
 
             System.out.println("Starting Multi-Threaded DPI Processing with " + numThreads + " worker threads...");
 
+            pcapWriter.open(outputFile);
+
             // Start load balancer thread
             executorService.submit(new LoadBalancerThread(inputQueue, workerQueues, numThreads));
 
@@ -58,7 +64,8 @@ public class MultiThreadedDPIEngine {
                     flows,
                     ruleManager,
                     stats,
-                    workerCompletionLatch
+                    workerCompletionLatch,
+                    pcapWriter
                 ));
             }
 
@@ -104,6 +111,8 @@ public class MultiThreadedDPIEngine {
                 System.err.println("Workers did not complete in time");
                 return false;
             }
+
+            pcapWriter.close();
 
             // Shutdown executor
             executorService.shutdown();

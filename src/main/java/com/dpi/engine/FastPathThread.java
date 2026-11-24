@@ -1,5 +1,6 @@
 package com.dpi.engine;
 
+import com.dpi.pcap.PcapWriter;
 import com.dpi.pcap.RawPacket;
 import com.dpi.parser.*;
 import com.dpi.extractor.*;
@@ -23,12 +24,15 @@ public class FastPathThread implements Runnable {
     private final RuleManager ruleManager;
     private final DPIStats stats;
     private final CountDownLatch completionLatch;
+    private final PcapWriter pcapWriter;
 
     public FastPathThread(BlockingQueue<RawPacket> inputQueue,
                          Map<FiveTuple, Connection> flows,
                          RuleManager ruleManager,
                          DPIStats stats,
-                         CountDownLatch completionLatch) {
+                         CountDownLatch completionLatch,
+                         PcapWriter pcapWriter) {
+        this.pcapWriter = pcapWriter;
         this.inputQueue = inputQueue;
         this.flows = flows;
         this.ruleManager = ruleManager;
@@ -94,6 +98,11 @@ public class FastPathThread implements Runnable {
         } else {
             connection.setAction(PacketAction.FORWARD);
             stats.incForwardedPackets();
+            try {
+                pcapWriter.writePacket(rawPacket);
+            } catch (java.io.IOException e) {
+                System.err.println("Could not write packet: " + e.getMessage());
+            }
         }
 
         connection.incPacketsIn();
