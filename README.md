@@ -74,7 +74,7 @@ java -cp target/packet-analyzer-2.0.0.jar com.dpi.engine.MultiThreadedDPIEngine 
 ## Known problems (things I plan to fix)
 
 - The output pcap is written by both engines (multi-thread output order can differ from the input)
-- --block-ip does not work in multi-thread mode (0 dropped instead of 5), because the two engines pack IPs in different byte order
+- --block-ip does not work in multi-thread mode (0 dropped instead of 5, now covered by a KNOWN BUG test)
 - In multi-thread mode, packets of one flow can go to different workers, so blocked counts can depend on timing
 - HTTP flows are labelled HTTPS
 - DNS lookups are labelled DNS, not by the domain asked, so blocking an app does not block its DNS lookup
@@ -159,7 +159,7 @@ java -cp target/packet-analyzer-2.0.0.jar com.dpi.engine.MultiThreadedDPIEngine 
 ## Known problems (things I plan to fix)
 
 - The output pcap is written by both engines (multi-thread output order can differ from the input)
-- --block-ip does not work in multi-thread mode (0 dropped instead of 5), because the two engines pack IPs in different byte order
+- --block-ip does not work in multi-thread mode (0 dropped instead of 5, now covered by a KNOWN BUG test)
 - In multi-thread mode, packets of one flow can go to different workers, so blocked counts can depend on timing
 - HTTP flows are labelled HTTPS
 - DNS lookups are labelled DNS, not by the domain asked, so blocking an app does not block its DNS lookup
